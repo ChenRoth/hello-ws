@@ -28,12 +28,27 @@ wss.on('connection', function connection(ws) {
     ws.on('message', function incoming(message) {
         console.log(`received: ${message}`);
         // send a msg every time we get a msg
-        ws.send('stop sending me messages!');
+        wss.clients.forEach(client => {
+            if (client !== ws) {
+                client.send(message);
+            }            
+        });
     });
 
-    // send this msg only once, when connected
     ws.send('Welcome!!!');
 });
+
+/*
+ in client, you can run 
+   const ws = new WebSocket('ws://localhost:3000');
+   ws.onopen = () => { console.log('connected!); }
+   ws.onmessage = (event) => { console.log('received a message', event.data) }
+   // wait for the websocket to open before sending a message!
+   // for example, we'll use setTimeout to wait a bit...
+   setTimeout(() => {
+        ws.send('hi server!');
+   });
+*/
 
 
 /**
